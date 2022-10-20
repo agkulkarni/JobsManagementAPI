@@ -1,0 +1,17 @@
+USE [Jobs]
+GO
+
+USE [Jobs]
+GO
+
+/****** Object:  Sequence [dbo].[SEQ_JOB_ID]    Script Date: 21-10-2022 01:53:33 ******/
+CREATE SEQUENCE [dbo].[SEQ_JOB_ID] 
+ AS [bigint]
+ START WITH 1000
+ INCREMENT BY 1
+ MINVALUE -9223372036854775808
+ MAXVALUE 9223372036854775807
+ CACHE 
+GO
+
+
