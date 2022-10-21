@@ -55,7 +55,9 @@ namespace JobsManagementAPI.Controllers
         [ResponseType(typeof(void))]
         public async Task<IHttpActionResult> PutDepartment(long id, Department department)
         {
-            if (!ModelState.IsValid)
+            try
+            {
+                if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
@@ -65,25 +67,23 @@ namespace JobsManagementAPI.Controllers
                 return BadRequest();
             }
 
-            db.Entry(department).State = EntityState.Modified;
-
-            try
+            if (db.Departments.Where(a => a.DeptId == id).Any())
             {
+                Department dept = db.Departments.Where(b => b.DeptId == id).FirstOrDefault();
+                if (!string.IsNullOrEmpty(department.Title) && dept.Title != department.Title)
+                    dept.Title = department.Title;
+
                 await db.SaveChangesAsync();
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!DepartmentExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            else
+                return NotFound();
 
             return StatusCode(HttpStatusCode.NoContent);
+            }
+            catch(Exception ex)
+            {
+                return InternalServerError(ex);
+            }            
         }
 
         // POST: api/Departments

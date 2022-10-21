@@ -23,7 +23,8 @@ namespace JobsManagementAPI.Controllers
         /// <param name="job">JSON request object</param>
         /// <returns>Valid HTTP response with generated job id</returns>
         [HttpPost]
-        public async Task<IHttpActionResult> PostJob([FromBody]Job job)
+        [Route("api/v1/jobs")]
+        public async Task<IHttpActionResult> PostJob(Job job)
         {
             try
             {
@@ -46,6 +47,7 @@ namespace JobsManagementAPI.Controllers
         /// <param name="job">Updated job JOSN request object</param>
         /// <returns>Valid HTTP response with generated job id</returns>
         [HttpPut]
+        [Route("api/v1/jobs/{id}")]
         public async Task<IHttpActionResult> PutJob(long id, Job job)
         {
             try
@@ -56,9 +58,33 @@ namespace JobsManagementAPI.Controllers
                 if (id != job.JobId)
                     return BadRequest();
 
-                db.Entry(job).State = EntityState.Modified;
-                await db.SaveChangesAsync();
-                return Ok(job.JobId);
+                if (db.Jobs.Where(a => a.JobId == id).Any())
+                {
+                    Job job1 = db.Jobs.Where(b => b.JobId == id).FirstOrDefault();
+                    if (!string.IsNullOrEmpty(job.Title) && job.Title != job1.Title)
+                        job1.Title = job.Title;
+
+                    if (!string.IsNullOrEmpty(job.Description) && job.Title != job1.Description)
+                        job1.Description = job.Description;
+
+                    if (job.LocId > 0 && job.LocId != job1.LocId)
+                        job1.LocId = job.LocId;
+
+                    if (job.DeptId > 0 && job.DeptId != job1.DeptId)
+                        job1.DeptId = job.DeptId;
+
+                    if (job.PostDate.Date != job1.PostDate.Date)
+                        job1.PostDate = job.PostDate;
+
+                    if (job.ClosingDate.Date != job1.ClosingDate.Date)
+                        job1.ClosingDate = job.ClosingDate;
+
+                    await db.SaveChangesAsync();
+                }
+                else
+                    return NotFound();
+
+                return StatusCode(HttpStatusCode.NoContent);
             }
             catch(Exception ex)
             {
@@ -71,7 +97,8 @@ namespace JobsManagementAPI.Controllers
         /// </summary>
         /// <param name="id">Job id</param>
         /// <returns>Valid HTTP response with generated JSON response</returns>
-        [HttpGet] 
+        [HttpGet]
+        [Route("api/v1/jobs/{id}")]
         public async Task<IHttpActionResult> GetJob(long id)
         {
             try

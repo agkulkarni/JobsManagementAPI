@@ -22,9 +22,9 @@ namespace JobsManagementAPI.Controllers
         /// Get all locations
         /// </summary>
         /// <returns>Valid HTTP response with generated JSON response</returns>
-        public IQueryable<Location> GetLocations()
+        public IHttpActionResult GetLocations()
         {
-            return db.Locations;
+            return Ok(db.Locations.ToList<Location>());
         }
 
         // GET: api/Locations/5
@@ -65,23 +65,28 @@ namespace JobsManagementAPI.Controllers
                 return BadRequest();
             }
 
-            db.Entry(location).State = EntityState.Modified;
+            if (db.Locations.Where(a => a.LocId == id).Any())
+            {
+                Location loc = db.Locations.Where(b => b.LocId == id).FirstOrDefault();
+                if (!string.IsNullOrEmpty(location.Name) && loc.Name != location.Name)
+                    loc.Name = location.Name;
 
-            try
-            {
-                await db.SaveChangesAsync();
+                if (!string.IsNullOrEmpty(location.City) && loc.City != location.City)
+                    loc.City = location.City;
+
+                if (!string.IsNullOrEmpty(location.State) && loc.State != location.State)
+                    loc.State = location.State;
+
+                if (!string.IsNullOrEmpty(location.Country) && loc.Country != location.Country)
+                    loc.Country = location.Country;
+
+                if (!string.IsNullOrEmpty(location.Zip) && loc.Zip != location.Zip)
+                    loc.Zip = location.Zip;
+
+                db.SaveChanges();
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!LocationExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            else
+                return NotFound();
 
             return StatusCode(HttpStatusCode.NoContent);
         }
