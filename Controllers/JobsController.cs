@@ -14,6 +14,7 @@ using JobsManagementAPI.Models;
 
 namespace JobsManagementAPI.Controllers
 {
+    [Authorize]
     public class JobsController : ApiController
     {
         private JobsEntities db = new JobsEntities();
@@ -136,6 +137,7 @@ namespace JobsManagementAPI.Controllers
         /// <returns>Valid HTTP response with generated JSON response</returns>
         [HttpPost]
         [Route("api/jobs/list")]
+        [Authorize]
         public IHttpActionResult GetJobsList(JobsListRequest jobsListRequest)
         {
             try

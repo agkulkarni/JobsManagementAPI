@@ -13,6 +13,7 @@ using JobsManagementAPI.Models;
 
 namespace JobsManagementAPI.Controllers
 {
+    [Authorize]
     public class DepartmentsController : ApiController
     {
         private JobsEntities db = new JobsEntities();
